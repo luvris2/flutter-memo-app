@@ -41,7 +41,7 @@ class MyAppState extends State<MyAppPage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
 
-  // 리스트뷰 카드 클릭 이벤트 핸들러
+  // 리스트뷰 카드 클릭 이벤트
   void cardClickEvent(BuildContext context, int index) {
     String content = itemContents[index];
     Navigator.push(
@@ -53,7 +53,7 @@ class MyAppState extends State<MyAppPage> {
     );
   }
 
-  // 플로팅 액션 버튼 클릭 이벤트 핸들러
+  // 플로팅 액션 버튼 클릭 이벤트
   Future<void> addItemEvent(BuildContext context) {
     // 다이얼로그 폼 열기
     return showDialog<void>(
