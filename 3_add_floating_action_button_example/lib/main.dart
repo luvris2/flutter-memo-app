@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// 검색을 위해 앱의 상태를 변경해야하므로 StatefulWidget 상속
+// 앱의 상태를 변경해야하므로 StatefulWidget 상속
 class MyAppPage extends StatefulWidget {
   const MyAppPage({super.key});
 
@@ -158,7 +158,6 @@ class MyAppState extends State<MyAppPage> {
             ),
           ],
         ),
-
         // 플로팅 액션 버튼
         floatingActionButton: FloatingActionButton(
           onPressed: () => addItemEvent(context), // 버튼을 누를 경우
