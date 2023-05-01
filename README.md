@@ -1,16 +1,5 @@
-# flutter_memo_app
+1_base_listview_example
+- 리스트뷰와 카드를 이용하여 목록을 출력하는 예시 프로젝트
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+2_add_search_example
+- 1번의 프로젝트를 토대로 검색 기능을 추가한 프로젝트
