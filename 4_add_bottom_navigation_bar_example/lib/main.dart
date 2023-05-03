@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -10,21 +11,81 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'MemoApp',
       home: MyAppPage(),
     );
   }
 }
 
-// 앱의 상태를 변경해야하므로 StatefulWidget 상속
+// 기본 홈
 class MyAppPage extends StatefulWidget {
   const MyAppPage({super.key});
 
   @override
-  MyAppState createState() => MyAppState();
+  State<MyAppPage> createState() => MyAppState();
 }
 
-// 메인 클래스의 상태 상속
 class MyAppState extends State<MyAppPage> {
+  // 바텀 네비게이션 바 인덱스
+  int _selectedIndex = 0;
+
+  final List<Widget> _navIndex = [
+    MyMemoPage(),
+    CommunityPage(),
+    MyInfoPage(),
+  ];
+
+  void _onNavTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _navIndex.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        fixedColor: Colors.blue,
+        unselectedItemColor: Colors.blueGrey,
+        showUnselectedLabels: true,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.home_filled),
+          //   label: '홈',
+          //   backgroundColor: Colors.white,
+          // ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.my_library_books_outlined),
+            label: '메모',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.chat_bubble_2),
+            label: '커뮤니티',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: '내 정보',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onNavTapped,
+      ),
+    );
+  }
+}
+
+// 메모 페이지
+// 앱의 상태를 변경해야하므로 StatefulWidget 상속
+class MyMemoPage extends StatefulWidget {
+  const MyMemoPage({super.key});
+
+  @override
+  MyMemoState createState() => MyMemoState();
+}
+
+class MyMemoState extends State<MyMemoPage> {
   // 검색어
   String searchText = '';
 
@@ -105,65 +166,62 @@ class MyAppState extends State<MyAppPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MemoApp', // 앱의 아이콘 이름
-      home: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text('Floating Acttion Button Example'), // 앱 상단바 설정
-        ),
-        body: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: '검색어를 입력해주세요.',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchText = value;
-                  });
-                },
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Bottom Navigation Bar Example'), // 앱 상단바 설정
+      ),
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: '검색어를 입력해주세요.',
+                border: OutlineInputBorder(),
               ),
+              onChanged: (value) {
+                setState(() {
+                  searchText = value;
+                });
+              },
             ),
-            Expanded(
-              child: ListView.builder(
-                // items 변수에 저장되어 있는 모든 값 출력
-                itemCount: items.length,
-                itemBuilder: (BuildContext context, int index) {
-                  // 검색 기능, 검색어가 있을 경우
-                  if (searchText.isNotEmpty &&
-                      !items[index]
-                          .toLowerCase()
-                          .contains(searchText.toLowerCase())) {
-                    return SizedBox.shrink();
-                  }
-                  // 검색어가 없을 경우, 모든 항목 표시
-                  else {
-                    return Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.all(Radius.elliptical(20, 20))),
-                      child: ListTile(
-                        title: Text(items[index]),
-                        onTap: () => cardClickEvent(context, index),
-                      ),
-                    );
-                  }
-                },
-              ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              // items 변수에 저장되어 있는 모든 값 출력
+              itemCount: items.length,
+              itemBuilder: (BuildContext context, int index) {
+                // 검색 기능, 검색어가 있을 경우
+                if (searchText.isNotEmpty &&
+                    !items[index]
+                        .toLowerCase()
+                        .contains(searchText.toLowerCase())) {
+                  return SizedBox.shrink();
+                }
+                // 검색어가 없을 경우, 모든 항목 표시
+                else {
+                  return Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.all(Radius.elliptical(20, 20))),
+                    child: ListTile(
+                      title: Text(items[index]),
+                      onTap: () => cardClickEvent(context, index),
+                    ),
+                  );
+                }
+              },
             ),
-          ],
-        ),
-        // 플로팅 액션 버튼
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => addItemEvent(context), // 버튼을 누를 경우
-          tooltip: 'Add Item', // 플로팅 액션 버튼 설명
-          child: Icon(Icons.add), // + 모양 아이콘 ),
-        ),
+          ),
+        ],
+      ),
+      // 플로팅 액션 버튼
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => addItemEvent(context), // 버튼을 누를 경우
+        tooltip: 'Add Item', // 플로팅 액션 버튼 설명
+        child: Icon(Icons.add), // + 모양 아이콘
       ),
     );
   }
@@ -183,6 +241,43 @@ class ContentPage extends StatelessWidget {
       ),
       body: Center(
         child: Text(content),
+      ),
+    );
+  }
+}
+
+// 커뮤니티 페이지
+class CommunityPage extends StatefulWidget {
+  const CommunityPage({super.key});
+
+  @override
+  State<CommunityPage> createState() => CommunityState();
+}
+
+class CommunityState extends State<CommunityPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'community page',
+        ),
+      ),
+    );
+  }
+}
+
+// 내 정보 페이지
+class MyInfoPage extends StatelessWidget {
+  const MyInfoPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'my info page',
+        ),
       ),
     );
   }
