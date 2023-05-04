@@ -9,3 +9,6 @@
 
 4_add_bottom_navigation_bar_example
 - 바텀 내비게이션 바를 이용하여 다른 페이지로 이동하는 프로젝트
+
+5_file_devide_example
+- 소스 코드의 유지 보수를 위해 각각의 위젯별로 파일을 분리하는 프로젝트
