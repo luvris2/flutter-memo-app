@@ -93,10 +93,6 @@ class MyMemoState extends State<MyMemoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Bottom Navigation Bar Example'), // 앱 상단바 설정
-      ),
       body: Column(
         children: <Widget>[
           Padding(

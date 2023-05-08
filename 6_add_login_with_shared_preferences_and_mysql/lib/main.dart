@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_memo_app/config/mysqlConnector.dart';
-import 'package:flutter_memo_app/login/loginMainPage.dart';
-
-import 'footer.dart';
+import 'package:flutter_memo_app/config/mySqlConnector.dart';
+import 'package:flutter_memo_app/loginPage/loginMainPage.dart';
 
 void main() {
-  dbConnector('test');
-  runApp(LoginMainPage());
+  dbConnector();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -16,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MemoApp',
-      home: MyAppPage(),
+      home: TokenCheck(),
     );
   }
 }
