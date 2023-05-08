@@ -12,3 +12,8 @@
 
 5_file_devide_example
 - 소스 코드의 유지 보수를 위해 각각의 위젯별로 파일을 분리하는 프로젝트
+
+6_add_login_with_shared_preferences_and_mysql
+- 회원가입, 로그인, 로그아웃, 자동 로그인 기능을 구현하는 프로젝트
+-- MySQL DB를 연동하여 회원의 정보를 등록하거나 조회
+-- Shared Preferences를 이용하여 자동 로그인 설정
