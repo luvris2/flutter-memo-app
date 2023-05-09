@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:crypto/crypto.dart'; // password hashing algorithms
 import 'dart:convert'; // for the utf8.encode method
 

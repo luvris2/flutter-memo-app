@@ -1,5 +1,4 @@
-// 기본 홈
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, file_names
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'communityPage/communityMainPage.dart';
 import 'memoPage/memoMainPage.dart';
 import 'myInfoPage/myInfoMainPage.dart';
 
+// 기본 홈
 class MyAppPage extends StatefulWidget {
   const MyAppPage({super.key});
 

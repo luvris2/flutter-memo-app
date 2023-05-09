@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, file_names
+
 import 'package:mysql_client/mysql_client.dart';
 import 'package:flutter_memo_app/config/dbInfo.dart';
 

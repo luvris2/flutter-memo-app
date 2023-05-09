@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 class DbInfo {
   static const String hostName =
       'yh-db.ccekp8a5rlv0.ap-northeast-2.rds.amazonaws.com';

@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, avoid_print
+
 import 'package:flutter_memo_app/config/hashPassword.dart';
 import 'package:flutter_memo_app/config/mySqlConnector.dart';
 import 'package:mysql_client/mysql_client.dart';

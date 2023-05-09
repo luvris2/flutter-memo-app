@@ -1,6 +1,7 @@
-// 내 정보 페이지
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 
+// 내 정보 페이지
 class MyInfoPage extends StatelessWidget {
   const MyInfoPage({super.key});
 

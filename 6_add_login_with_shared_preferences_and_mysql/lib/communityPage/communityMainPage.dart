@@ -1,6 +1,7 @@
-// 커뮤니티 페이지
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 
+// 커뮤니티 페이지
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
 

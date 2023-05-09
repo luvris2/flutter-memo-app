@@ -1,5 +1,7 @@
 // 메모 페이지
 // 앱의 상태를 변경해야하므로 StatefulWidget 상속
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 
 import 'memoDetailPage.dart';

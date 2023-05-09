@@ -1,6 +1,7 @@
-// 선택한 항목의 내용을 보여주는 추가 페이지
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 
+// 선택한 항목의 내용을 보여주는 추가 페이지
 class ContentPage extends StatelessWidget {
   final String content;
 
