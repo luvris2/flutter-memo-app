@@ -48,12 +48,10 @@ class MyMemoState extends State<MyMemoPage> {
         'createDate': row.colByName('createDate'),
         'updateDate': row.colByName('updateDate')
       };
-
       memoList.add(memoInfo);
     }
-    context.read<MemoUpdator>().updateList(memoList);
 
-    print('call function(getMemoList) : $items');
+    context.read<MemoUpdator>().updateList(memoList);
   }
 
   @override
@@ -73,8 +71,6 @@ class MyMemoState extends State<MyMemoPage> {
         builder: (context) => ContentPage(content: content),
       ),
     );
-
-    print('null check : $isMemoUpdate');
 
     if (isMemoUpdate != null) {
       setState(() {
@@ -160,7 +156,7 @@ class MyMemoState extends State<MyMemoPage> {
           Expanded(
             child: Builder(
               builder: (context) {
-                print('builder load');
+                // 메모 수정이 일어날 경우 메모 리스트 새로고침
                 items = context.watch<MemoUpdator>().memoList;
 
                 if (items.isEmpty) {
