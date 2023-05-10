@@ -92,9 +92,6 @@ Future<void> updateMemo(String id, String title, String content) async {
   // 쿼리 수행 결과 저장 변수
   IResultSet? result;
 
-  print('******************** id : $id');
-  print('******************** token : $token');
-  print('******************** title : $title');
   // 메모 수정
   try {
     await conn.execute(

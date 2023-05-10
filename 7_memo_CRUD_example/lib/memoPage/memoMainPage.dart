@@ -24,16 +24,22 @@ class MyMemoState extends State<MyMemoPage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
 
+  // 메모 리스트 저장 변수
   List items = [];
+  // 메모 리스트 업데이트 확인 변수 (false : 업데이트 되지 않음, true : 업데이트 됨)
+  var isMemoUpdate;
 
   // 메모 리스트 출력
   Future<void> getMemoList() async {
+    List memoList = [];
     // DB에서 메모 정보 호출
     var result = await selectMemoALL();
 
+    print(result?.numOfRows);
+
     // 메모 정보 items에 저장
     for (final row in result!.rows) {
-      var item = {
+      var memoInfo = {
         'id': row.colByName('id'),
         'userIndex': row.colByName('userIndex'),
         'userName': row.colByName('userName'),
@@ -43,22 +49,39 @@ class MyMemoState extends State<MyMemoPage> {
         'updateDate': row.colByName('updateDate')
       };
 
-      items.add(item);
-      context.read<MemoUpdator>().updateList(items);
-      print('getMemoList : $items');
+      memoList.add(memoInfo);
     }
+    context.read<MemoUpdator>().updateList(memoList);
+
+    print('call function(getMemoList) : $items');
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getMemoList();
   }
 
   // 리스트뷰 카드 클릭 이벤트
-  void cardClickEvent(BuildContext context, int index) {
+  void cardClickEvent(BuildContext context, int index) async {
     dynamic content = items[index];
-    Navigator.push(
+    isMemoUpdate = await Navigator.push(
       context,
       MaterialPageRoute(
         // 정의한 ContentPage의 폼 호출
         builder: (context) => ContentPage(content: content),
       ),
     );
+
+    print('null check : $isMemoUpdate');
+
+    if (isMemoUpdate != null) {
+      setState(() {
+        getMemoList();
+        items = context.watch<MemoUpdator>().memoList;
+      });
+    }
   }
 
   // 플로팅 액션 버튼 클릭 이벤트
@@ -68,7 +91,7 @@ class MyMemoState extends State<MyMemoPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('항목 추가하기'),
+          title: Text('메모 추가'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -103,6 +126,7 @@ class MyMemoState extends State<MyMemoPage> {
                   // 메모 추가
                   addMemo(title, content);
                   // 메모 리스트 새로고침
+                  print("add memo");
                   getMemoList();
                 });
                 Navigator.of(context).pop();
@@ -112,13 +136,6 @@ class MyMemoState extends State<MyMemoPage> {
         );
       },
     );
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getMemoList();
   }
 
   @override
@@ -143,7 +160,9 @@ class MyMemoState extends State<MyMemoPage> {
           Expanded(
             child: Builder(
               builder: (context) {
-                context.watch<MemoUpdator>().memoList;
+                print('builder load');
+                items = context.watch<MemoUpdator>().memoList;
+
                 if (items.isEmpty) {
                   return Center(
                     child: Text(
