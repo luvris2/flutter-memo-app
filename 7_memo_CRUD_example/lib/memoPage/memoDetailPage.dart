@@ -1,7 +1,12 @@
 // 선택한 항목의 내용을 보여주는 추가 페이지
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_memo_app/memoPage/memoDB.dart';
+import 'package:flutter_memo_app/memoPage/memoListProvider.dart';
+import 'package:flutter_memo_app/memoPage/memoMainPage.dart';
+import 'package:provider/provider.dart';
 
 class ContentPage extends StatefulWidget {
   final dynamic content;
@@ -15,6 +20,9 @@ class _ContentState extends State<ContentPage> {
   final dynamic content;
 
   _ContentState({required this.content});
+
+  // 메모의 정보를 저장할 변수
+  List memoInfo = [];
 
   // 앱 바 메모 수정 버튼을 이용하여 메모를 수정할 제목과 내용
   final TextEditingController titleController = TextEditingController();
@@ -65,15 +73,76 @@ class _ContentState extends State<ContentPage> {
                 String memoTitle = titleController.text;
                 String memoContent = contentController.text;
                 // 메모 수정
-                print('memo : ${content['id']} , $memoTitle , $memoContent');
                 updateMemo(content['id'], memoTitle, memoContent);
-                Navigator.of(context).pop(1);
+
+                // 업데이트 된 메모 정보 호출
+                updateRefresh();
+
+                Navigator.of(context).pop();
               },
             ),
           ],
         );
       },
     );
+  }
+
+  // 메모 삭제
+  void deleteItemEvent(BuildContext context) {
+    deleteMemo(memoInfo[0]['id']);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MyMemoPage(),
+      ),
+    );
+  }
+
+  // 메모 수정시 화면 새로고침
+  Future<void> updateRefresh() async {
+    List memoList = [];
+    // DB에서 메모 정보 호출
+    var result = await selectMemo(content['id']);
+
+    // 특정 메모 정보 저장
+    for (final row in result!.rows) {
+      var memo = {
+        'id': row.colByName('id'),
+        'userIndex': row.colByName('userIndex'),
+        'userName': row.colByName('userName'),
+        'memoTitle': row.colByName('memoTitle'),
+        'memoContent': row.colByName('memoContent'),
+        'createDate': row.colByName('createDate'),
+        'updateDate': row.colByName('updateDate')
+      };
+      memoList.add(memo);
+    }
+    print("memo : $memoList");
+    context.read<MemoUpdator>().updateList(memoList);
+
+    setState(() {
+      memoInfo = context.watch<MemoUpdator>().memoList;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    var memo = {
+      'id': content['id'],
+      'userIndex': content['userIndex'],
+      'userName': content['userName'],
+      'memoTitle': content['memoTitle'],
+      'memoContent': content['memoContent'],
+      'createDate': content['createDate'],
+      'updateDate': content['updateDate']
+    };
+    List memoList = [];
+    memoList.add(memo);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MemoUpdator>().updateList(memoList);
+    });
   }
 
   @override
@@ -94,7 +163,7 @@ class _ContentState extends State<ContentPage> {
             tooltip: "메모 수정",
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () => deleteItemEvent(context),
             icon: Icon(CupertinoIcons.delete_solid),
             tooltip: "메모 삭제",
           ),
@@ -103,188 +172,58 @@ class _ContentState extends State<ContentPage> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Stack(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(),
-                  Text(
-                    content['memoTitle'],
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  SizedBox(height: 35),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [Text('작성자 : ${content['userName']}')],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [Text('작성일 : ${content['createDate']}')],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [Text('수정일 : ${content['updateDate']}')],
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: SizedBox(
-                        height: double.infinity,
-                        width: double.infinity,
-                        child: Text(
-                          content['memoContent'],
+          child: Builder(builder: (context) {
+            // 특정 메모 정보 출력
+            memoInfo = context.watch<MemoUpdator>().memoList;
+
+            return Stack(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(),
+                    Text(
+                      memoInfo[0]['memoTitle'],
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    SizedBox(height: 35),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [Text('작성자 : ${memoInfo[0]['userName']}')],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [Text('작성일 : ${memoInfo[0]['createDate']}')],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [Text('수정일 : ${memoInfo[0]['updateDate']}')],
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: SizedBox(
+                          height: double.infinity,
+                          width: double.infinity,
+                          child: Text(
+                            memoInfo[0]['memoContent'],
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
+                    )
+                  ],
+                ),
+              ],
+            );
+          }),
         ),
       ),
     );
   }
 }
-
-// class ContentPage extends StatelessWidget {
-//   final dynamic content;
-
-//   ContentPage({Key? key, required this.content}) : super(key: key);
-
-//   // 앱 바 메모 수정 버튼을 이용하여 메모를 수정할 제목과 내용
-//   final TextEditingController titleController = TextEditingController();
-//   final TextEditingController contentController = TextEditingController();
-
-//   // 앱 바 메모 수정 클릭 이벤트
-//   Future<void> updateItemEvent(BuildContext context) {
-//     // 앱 바 메모 수정 버튼을 이용하여 메모를 수정할 제목과 내용
-//     final TextEditingController titleController =
-//         TextEditingController(text: content['memoTitle']);
-//     final TextEditingController contentController =
-//         TextEditingController(text: content['memoContent']);
-
-//     // 다이얼로그 폼 열기
-//     return showDialog<void>(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Text('항목 추가하기'),
-//           content: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: <Widget>[
-//               TextField(
-//                 controller: titleController,
-//                 decoration: InputDecoration(
-//                   labelText: '제목',
-//                 ),
-//               ),
-//               TextField(
-//                 controller: contentController,
-//                 maxLines: null, // 다중 라인 허용
-//                 decoration: InputDecoration(
-//                   labelText: '내용',
-//                 ),
-//               ),
-//             ],
-//           ),
-//           actions: <Widget>[
-//             TextButton(
-//               child: Text('취소'),
-//               onPressed: () {
-//                 Navigator.of(context).pop();
-//               },
-//             ),
-//             TextButton(
-//               child: Text('수정'),
-//               onPressed: () {
-//                 String memoTitle = titleController.text;
-//                 String memoContent = contentController.text;
-//                 // 메모 수정
-//                 print('memo : ${content['id']} , $memoTitle , $memoContent');
-//                 updateMemo(content['id'], memoTitle, memoContent);
-//                 Navigator.of(context).pop();
-//               },
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('메모 상세 보기'),
-//         actions: [
-//           IconButton(
-//             onPressed: () => updateItemEvent(context),
-//             icon: Icon(Icons.edit),
-//             tooltip: "메모 수정",
-//           ),
-//           IconButton(
-//             onPressed: () {},
-//             icon: Icon(CupertinoIcons.delete_solid),
-//             tooltip: "메모 삭제",
-//           ),
-//         ],
-//       ),
-//       body: Center(
-//         child: Padding(
-//           padding: const EdgeInsets.all(20.0),
-//           child: Stack(
-//             children: <Widget>[
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 crossAxisAlignment: CrossAxisAlignment.center,
-//                 children: [
-//                   SizedBox(),
-//                   Text(
-//                     content['memoTitle'],
-//                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-//                   ),
-//                 ],
-//               ),
-//               Column(
-//                 children: [
-//                   SizedBox(height: 35),
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.end,
-//                     children: [Text('작성자 : ${content['userName']}')],
-//                   ),
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.end,
-//                     children: [Text('작성일 : ${content['createDate']}')],
-//                   ),
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.end,
-//                     children: [Text('수정일 : ${content['updateDate']}')],
-//                   ),
-//                   Expanded(
-//                     child: Padding(
-//                       padding: const EdgeInsets.all(15.0),
-//                       child: SizedBox(
-//                         height: double.infinity,
-//                         width: double.infinity,
-//                         child: Text(
-//                           content['memoContent'],
-//                         ),
-//                       ),
-//                     ),
-//                   )
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

@@ -20,7 +20,8 @@ Future<IResultSet?> selectMemoALL() async {
   // 유저의 모든 메모 보기
   try {
     result = await conn.execute(
-        "SELECT * FROM memo WHERE userIndex = :token", {"token": token});
+        "SELECT m.id, userIndex, u.userName, memoTitle, memoContent, createDate, updateDate FROM memo AS m LEFT JOIN users AS u ON m.userIndex = u.id WHERE userIndex = :token",
+        {"token": token});
     if (result.numOfRows > 0) {
       return result;
     }
@@ -63,13 +64,8 @@ Future<String?> addMemo(String title, String content) async {
 
     // 메모 추가
     result = await conn.execute(
-      "INSERT INTO memo (userIndex, userName, memoTitle, memoContent) VALUES (:userIndex, :userName, :title, :content)",
-      {
-        "userIndex": token,
-        "userName": userName,
-        "title": title,
-        "content": content
-      },
+      "INSERT INTO memo (userIndex, memoTitle, memoContent) VALUES (:userIndex, :title, :content)",
+      {"userIndex": token, "title": title, "content": content},
     );
   } catch (e) {
     print('Error : $e');
@@ -97,6 +93,48 @@ Future<void> updateMemo(String id, String title, String content) async {
     await conn.execute(
         "UPDATE memo SET memoTitle = :title, memoContent = :content where id = :id and userIndex = :token",
         {"id": id, "token": token, "title": title, "content": content});
+  } catch (e) {
+    print('Error : $e');
+  } finally {
+    await conn.close();
+  }
+}
+
+// 특정 메모 조회
+Future<IResultSet?> selectMemo(String id) async {
+  // MySQL 접속 설정
+  final conn = await dbConnector();
+
+  // 유저 식별 정보 호출
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? token = prefs.getString('token');
+
+  // 쿼리 수행 결과 저장 변수
+  IResultSet? result;
+
+  // 메모 수정
+  try {
+    result = await conn.execute(
+        "SELECT m.id, userIndex, u.userName, memoTitle, memoContent, createDate, updateDate FROM memo AS m LEFT JOIN users AS u ON m.userIndex = u.id WHERE userIndex = :token and m.id = :id",
+        {"token": token, "id": id});
+    return result;
+  } catch (e) {
+    print('Error : $e');
+  } finally {
+    await conn.close();
+  }
+
+  return null;
+}
+
+// 특정 메모 삭제
+Future<void> deleteMemo(String id) async {
+  // MySQL 접속 설정
+  final conn = await dbConnector();
+
+  // 메모 수정
+  try {
+    await conn.execute("DELETE FROM memo WHERE id = :id", {"id": id});
   } catch (e) {
     print('Error : $e');
   } finally {

@@ -26,8 +26,6 @@ class MyMemoState extends State<MyMemoPage> {
 
   // 메모 리스트 저장 변수
   List items = [];
-  // 메모 리스트 업데이트 확인 변수 (false : 업데이트 되지 않음, true : 업데이트 됨)
-  var isMemoUpdate;
 
   // 메모 리스트 출력
   Future<void> getMemoList() async {
@@ -37,7 +35,7 @@ class MyMemoState extends State<MyMemoPage> {
 
     print(result?.numOfRows);
 
-    // 메모 정보 items에 저장
+    // 메모 리스트 저장
     for (final row in result!.rows) {
       var memoInfo = {
         'id': row.colByName('id'),
@@ -51,6 +49,7 @@ class MyMemoState extends State<MyMemoPage> {
       memoList.add(memoInfo);
     }
 
+    print(memoList);
     context.read<MemoUpdator>().updateList(memoList);
   }
 
@@ -64,7 +63,9 @@ class MyMemoState extends State<MyMemoPage> {
   // 리스트뷰 카드 클릭 이벤트
   void cardClickEvent(BuildContext context, int index) async {
     dynamic content = items[index];
-    isMemoUpdate = await Navigator.push(
+    print('content : $content');
+    // 메모 리스트 업데이트 확인 변수 (false : 업데이트 되지 않음, true : 업데이트 됨)
+    var isMemoUpdate = await Navigator.push(
       context,
       MaterialPageRoute(
         // 정의한 ContentPage의 폼 호출
@@ -75,6 +76,7 @@ class MyMemoState extends State<MyMemoPage> {
     if (isMemoUpdate != null) {
       setState(() {
         getMemoList();
+        print('setState');
         items = context.watch<MemoUpdator>().memoList;
       });
     }
