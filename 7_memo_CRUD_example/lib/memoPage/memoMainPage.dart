@@ -73,6 +73,7 @@ class MyMemoState extends State<MyMemoPage> {
       ),
     );
 
+    // 메모 수정이 일어날 경우, 메모 메인 페이지의 리스트 새로고침
     if (isMemoUpdate != null) {
       setState(() {
         getMemoList();
