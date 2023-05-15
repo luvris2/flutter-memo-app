@@ -49,7 +49,7 @@ class MyMemoState extends State<MyMemoPage> {
       memoList.add(memoInfo);
     }
 
-    print(memoList);
+    print('MemoMainPage - getMemoList : $memoList');
     context.read<MemoUpdator>().updateList(memoList);
   }
 
@@ -76,8 +76,7 @@ class MyMemoState extends State<MyMemoPage> {
     if (isMemoUpdate != null) {
       setState(() {
         getMemoList();
-        print('setState');
-        items = context.watch<MemoUpdator>().memoList;
+        items = Provider.of<MemoUpdator>(context, listen: false).memoList;
       });
     }
   }
@@ -117,14 +116,15 @@ class MyMemoState extends State<MyMemoPage> {
             ),
             TextButton(
               child: Text('추가'),
-              onPressed: () {
+              onPressed: () async {
+                String title = titleController.text;
+                String content = contentController.text;
+                // 메모 추가
+                await addMemo(title, content);
+
                 setState(() {
-                  String title = titleController.text;
-                  String content = contentController.text;
-                  // 메모 추가
-                  addMemo(title, content);
                   // 메모 리스트 새로고침
-                  print("add memo");
+                  print("MemoMainPage - addMemo/setState");
                   getMemoList();
                 });
                 Navigator.of(context).pop();
@@ -161,6 +161,7 @@ class MyMemoState extends State<MyMemoPage> {
                 // 메모 수정이 일어날 경우 메모 리스트 새로고침
                 items = context.watch<MemoUpdator>().memoList;
 
+                // 메모가 없을 경우의 페이지
                 if (items.isEmpty) {
                   return Center(
                     child: Text(
@@ -168,7 +169,9 @@ class MyMemoState extends State<MyMemoPage> {
                       style: TextStyle(fontSize: 20),
                     ),
                   );
-                } else {
+                }
+                // 메모가 있을 경우의 페이지
+                else {
                   // items 변수에 저장되어 있는 모든 값 출력
                   return ListView.builder(
                     itemCount: items.length,
@@ -215,7 +218,7 @@ class MyMemoState extends State<MyMemoPage> {
       ),
       // 플로팅 액션 버튼
       floatingActionButton: FloatingActionButton(
-        onPressed: () => addItemEvent(context), // 버튼을 누를 경우
+        onPressed: () => addItemEvent(context), // 버튼을 누를 경우 메모 추가 UI 표시
         tooltip: 'Add Item', // 플로팅 액션 버튼 설명
         child: Icon(Icons.add), // + 모양 아이콘
       ),

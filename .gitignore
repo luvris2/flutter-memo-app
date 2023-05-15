@@ -44,4 +44,4 @@ app.*.map.json
 /android/app/release
 
 # MySQL Connection Private Information
-7_memo_CRUD_example/lib/config/dbInfo.dart
+#7_memo_CRUD_example/lib/config/dbInfo.dart

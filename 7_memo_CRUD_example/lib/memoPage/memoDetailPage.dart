@@ -9,6 +9,7 @@ import 'package:flutter_memo_app/memoPage/memoMainPage.dart';
 import 'package:provider/provider.dart';
 
 class ContentPage extends StatefulWidget {
+  // 생성자 초기화
   final dynamic content;
   const ContentPage({Key? key, required this.content}) : super(key: key);
 
@@ -17,8 +18,8 @@ class ContentPage extends StatefulWidget {
 }
 
 class _ContentState extends State<ContentPage> {
+  // 부모에게 받은 생성자 값 초기화
   final dynamic content;
-
   _ContentState({required this.content});
 
   // 메모의 정보를 저장할 변수
@@ -31,10 +32,10 @@ class _ContentState extends State<ContentPage> {
   // 앱 바 메모 수정 클릭 이벤트
   Future<void> updateItemEvent(BuildContext context) {
     // 앱 바 메모 수정 버튼을 이용하여 메모를 수정할 제목과 내용
-    final TextEditingController titleController =
-        TextEditingController(text: content['memoTitle']);
-    final TextEditingController contentController =
-        TextEditingController(text: content['memoContent']);
+    TextEditingController titleController =
+        TextEditingController(text: memoInfo[0]['memoTitle']);
+    TextEditingController contentController =
+        TextEditingController(text: memoInfo[0]['memoContent']);
 
     // 다이얼로그 폼 열기
     return showDialog<void>(
@@ -72,13 +73,20 @@ class _ContentState extends State<ContentPage> {
               onPressed: () async {
                 String memoTitle = titleController.text;
                 String memoContent = contentController.text;
+
+                Navigator.of(context).pop();
+
+                print('memoTitle : $memoTitle');
                 // 메모 수정
-                updateMemo(content['id'], memoTitle, memoContent);
+                await updateMemo(content['id'], memoTitle, memoContent);
 
                 // 업데이트 된 메모 정보 호출
                 updateRefresh();
 
-                Navigator.of(context).pop();
+                // 메모 내용 업데이트
+                setState(() {
+                  memoInfo = context.watch<MemoUpdator>().memoList;
+                });
               },
             ),
           ],
@@ -117,12 +125,8 @@ class _ContentState extends State<ContentPage> {
       };
       memoList.add(memo);
     }
-    print("memo : $memoList");
+    print("memo update : $memoList");
     context.read<MemoUpdator>().updateList(memoList);
-
-    setState(() {
-      memoInfo = context.watch<MemoUpdator>().memoList;
-    });
   }
 
   @override
@@ -140,6 +144,8 @@ class _ContentState extends State<ContentPage> {
     };
     List memoList = [];
     memoList.add(memo);
+
+    // 빌드가 완료된 후 Provider의 데이터 읽기
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MemoUpdator>().updateList(memoList);
     });
@@ -149,6 +155,7 @@ class _ContentState extends State<ContentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // 좌측 상단의 뒤로 가기 버튼
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
