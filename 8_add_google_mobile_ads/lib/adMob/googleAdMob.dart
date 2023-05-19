@@ -1,5 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+// 비동기 작업의 완료 상태 확인을 위함
+import 'dart:async';
+// 구글 애드몹 사용을 위함
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GoogleAdMob {
@@ -7,10 +9,7 @@ class GoogleAdMob {
   static BannerAd loadBannerAd() {
     // 배너 광고
     BannerAd myBanner = BannerAd(
-      // Test 광고 ID, 광고 승인받은 후 생성한 광고 unit ID 로 바꾸기
-      adUnitId: Platform.isAndroid
-          ? 'ca-app-pub-3940256099942544/6300978111' // Android ad unit ID
-          : 'ca-app-pub-3940256099942544/2934735716', // iOS ad unit ID
+      adUnitId: 'ca-app-pub-9914634594152112/4988082034', // 내 리워드 광고 통합 APP ID
       /*
       크기(폭x높이)        설명               AdSize 상수
       -----------------------------------------------------------------------
@@ -64,12 +63,7 @@ class GoogleAdMob {
   static void showInterstitialAd() {
     // 전면 광고 로드
     InterstitialAd.load(
-      // Test 광고 ID, 광고 승인받은 후 생성한 광고 unit ID 로 바꾸기
-      adUnitId: Platform.isAndroid
-          ? 'ca-app-pub-3940256099942544/1033173712' // Android ad unit ID
-          : 'ca-app-pub-3940256099942544/4411468910', // iOS ad unit ID
-      // ? 'ca-app-pub-3940256099942544/8691691433' // Android ad unit ID (Video)
-      // : 'ca-app-pub-3940256099942544/5135589807' // iOS ad unit ID (Video)
+      adUnitId: 'ca-app-pub-9914634594152112/3639341340', // 내 리워드 광고 통합 APP ID
       request: AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         // 전면 광고 로드 완료
@@ -87,18 +81,21 @@ class GoogleAdMob {
     );
   }
 
-  static void showRewardedAd() async {
-    await RewardedInterstitialAd.load(
-      // Test 광고 ID, 광고 승인받은 후 생성한 광고 unit ID 로 바꾸기
-      adUnitId: Platform.isAndroid
-          // ? 'ca-app-pub-3940256099942544/5224354917' // Android ad unit ID
-          // : 'ca-app-pub-3940256099942544/1712485313', // iOS ad unit ID
-          ? 'ca-app-pub-3940256099942544/5354046379' // Android ad unit ID (Interstitial)
-          : 'ca-app-pub-3940256099942544/6978759866', // iOS ad unit ID (Interstitial)
+  // 보상형 광고 보여주기 위한 함수, bool 반환값을 통해 보상이 지급되었는지 확인
+  static Future<bool> showRewardedAd() async {
+    print('******************showRewardedAD******************');
+
+    // 비동기 작업을 확인하기 위한 bool 타입의 Completer
+    Completer<bool> completer = Completer<bool>();
+    // 보상 지급 확인 변수
+    bool isRewarded = false;
+
+    await RewardedAd.load(
+      adUnitId: 'ca-app-pub-9914634594152112/1617126316', // 내 리워드 광고 통합 APP ID
       request: AdRequest(),
-      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
         // 보상 광고 로드 완료
-        onAdLoaded: (rewardedAd) {
+        onAdLoaded: (rewardedAd) async {
           rewardedAd.fullScreenContentCallback = FullScreenContentCallback(
             // 광고가 표시 될 때 호출
             onAdShowedFullScreenContent: (ad) =>
@@ -108,27 +105,35 @@ class GoogleAdMob {
               print('$ad onAdDismissedFullScreenContent.');
               // 광고 리소스 해제
               ad.dispose();
+              completer.complete(isRewarded);
             },
             // 광고가 표시되지 못했을 때의 호출, 오류 정보 제공
             onAdFailedToShowFullScreenContent: (ad, AdError error) {
               print('$ad onAdFailedToShowFullScreenContent: $error');
               ad.dispose();
+              completer.complete(isRewarded);
             },
             // 광고가 노출되었을 때 호출
             onAdImpression: (ad) => print('$ad impression occurred.'),
           );
           // 광고 보여주기
-          rewardedAd.show(
+          await rewardedAd.show(
             onUserEarnedReward: (ad, reward) {
               // 광고 보상 지급 코드
+              print(
+                  'Reward ad : $ad    reward : $reward,   type : ${reward.type},    amount : ${reward.amount}');
+              // 보상 지급 완료 처리
+              isRewarded = true;
             },
           );
         },
         // 보상 광고 로드 실패
         onAdFailedToLoad: (LoadAdError error) {
           print('RewardedAd failed to load: $error');
+          completer.complete(isRewarded);
         },
       ),
     );
+    return completer.future;
   }
 }

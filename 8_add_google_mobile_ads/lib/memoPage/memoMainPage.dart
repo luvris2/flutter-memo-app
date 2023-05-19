@@ -62,16 +62,19 @@ class MyMemoState extends State<MyMemoPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    // 메모 리스트 출력
     getMemoList();
+
     // 배너 광고 로드
     myBanner = GoogleAdMob.loadBannerAd();
     myBanner.load();
 
     // 전면 광고 로드
-    //GoogleAdMob.showInterstitialAd();
+    GoogleAdMob.showInterstitialAd();
 
     // 보상 광고 로드
-    GoogleAdMob.showRewardedAd();
+    //GoogleAdMob.showRewardedAd();
   }
 
   // 리스트뷰 카드 클릭 이벤트

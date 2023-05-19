@@ -3,6 +3,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_memo_app/adMob/googleAdMob.dart';
 import 'package:flutter_memo_app/loginPage/loginMainPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -43,6 +44,39 @@ class MyAppState extends State<MyAppPage> {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // 보상형 광고 보기 버튼
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: Icon(
+                CupertinoIcons.money_dollar_circle,
+                size: 30,
+              ),
+              onPressed: () async {
+                // 보상형 광고 보여주기
+                var rewardedAds = await GoogleAdMob.showRewardedAd();
+
+                // 광고 보상 지급 완료 메시지
+                if (rewardedAds) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Text('보상이 지급되었습니다.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // 다이얼로그 닫기,
+                            },
+                            child: Text('닫기'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+
             // 로그아웃 기능
             CupertinoButton(
               padding: EdgeInsets.zero,
